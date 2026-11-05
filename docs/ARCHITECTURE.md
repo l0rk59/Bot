@@ -40,6 +40,8 @@ Par ordre de préférence :
 |---|---|---|---|
 | **API de données** (Keepa pour Amazon) | Fiable, structurée, autorisée, plusieurs pays, historique inclus | Payante, quota de jetons | **Source Amazon** si l'option de budget C est choisie (voir [SITES.md](SITES.md)) |
 | **API officielle** (ex. Creators API d'Amazon) | Fiable, structurée, autorisée | Réservée aux affiliés qui génèrent des ventes | Écartée pour un usage personnel |
+| **API publiques gratuites** (eBay Browse API, Rakuten Japon, Best Buy) | Autorisées, structurées, multi-pays (eBay) | Quotas (eBay : 5 000 appels par jour), compte développeur | **Source « monde entier »** |
+| **Plateformes e-commerce ouvertes** (Shopify `/products.json`) | Un seul connecteur pour des milliers de boutiques, JSON propre | Ouvert boutique par boutique, CGU de chaque boutique | **Source « monde entier »** |
 | **Flux produits d'affiliation** (Awin, Effiliation, Kwanko, Rakuten…) | Catalogue complet avec EAN, autorisé | Inscription avec un site ou une chaîne, mise à jour souvent quotidienne | Écartés pour un usage personnel |
 | **Données structurées des pages** (JSON-LD schema.org `Product`/`Offer`) | Résiste aux refontes visuelles, une seule méthode pour beaucoup de sites | Il faut récupérer la page | Collecte principale par défaut |
 | **Pages de liste** (catégories, recherche) | 20 à 60 prix par requête | Moins de détails, EAN souvent absent | Balayage large |
@@ -98,6 +100,19 @@ Pièges à couvrir par des tests :
 - Prix barré pris pour le prix réel, et inversement.
 
 **Les prix sont manipulés avec `Decimal`, jamais avec `float`.**
+
+### Trois types de connecteurs
+
+La plupart des sites accessibles exposent du JSON-LD (voir [SITES.md](SITES.md)). On ne code
+donc pas un connecteur par site, mais trois connecteurs réutilisables :
+
+| Connecteur | Couvre | Ajouter une source |
+|---|---|---|
+| `jsonld` (générique) | Tous les sites avec données structurées : LDLC, Alternate, Cyberport, Elgiganten… | Un fichier YAML (domaine, pages de liste ou sitemap, débit), **sans code** |
+| `shopify` | Toutes les boutiques Shopify qui exposent `/products.json` | Une ligne : le domaine de la boutique |
+| `api` (un par API) | eBay, Rakuten Japon, Best Buy, Keepa (Amazon) | Clé d'API dans `.env` |
+
+Un connecteur spécifique n'est écrit que si un site sort du lot (prix en JavaScript, structure particulière).
 
 ## 5. Normalisation
 
@@ -218,7 +233,10 @@ planificateur maison : limitation de débit intégrée, respect de `robots.txt`,
 │   ├── extract/                # JSON-LD, microdata, OpenGraph, sélecteurs
 │   ├── connectors/
 │   │   ├── base.py             # interface Connector
-│   │   └── <site>.py
+│   │   ├── jsonld.py           # connecteur générique, piloté par config/retailers/*.yaml
+│   │   ├── shopify.py          # toutes les boutiques Shopify
+│   │   ├── ebay.py             # API eBay (Browse API)
+│   │   └── keepa.py            # Amazon, si option C
 │   ├── normalize/              # devises, EAN, état, vendeur
 │   ├── storage/                # SQLAlchemy, dépôts, migrations Alembic
 │   ├── scheduler/

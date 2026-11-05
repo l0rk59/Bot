@@ -7,7 +7,7 @@
 | **Usage** | Personnel uniquement |
 | **Marché** | Monde entier, par étapes : France, puis Union européenne, puis reste du monde |
 | **Verticale** | Produits physiques d'abord. Vols et hôtels plus tard |
-| **Sites** | LDLC (MVP), Rue du Commerce, Electro Dépôt, puis d'autres après vérification. Voir [SITES.md](SITES.md) |
+| **Sites** | LDLC (MVP), puis une quarantaine de sources : sites JSON-LD en France et en Europe, API eBay, boutiques Shopify. Voir [SITES.md](SITES.md) |
 | **Budget** | **Option A, 0 €** : le bot tourne sur l'ordinateur personnel, pas d'Amazon pour l'instant |
 | **Temps** | **Plein temps** (environ 35 h par semaine) |
 | **Canal d'alerte** | Telegram |
@@ -95,10 +95,12 @@ moins de N + 1 minutes. Le bot tourne 48 h sur LDLC sans planter.
 **Objectif** : passer du prototype à un système multi-sites qui tourne seul sur l'ordinateur.
 
 - [ ] PostgreSQL et migrations (Alembic), dans Docker.
-- [ ] Interface `Connector` commune et configuration par site en YAML : débit, priorité, activation.
-- [ ] Connecteurs **Rue du Commerce** (découverte par le sitemap, pas de pagination) et
-      **Electro Dépôt** (catégories sans tri ni filtre).
-- [ ] Identité produit : regroupement des offres par EAN pour comparer LDLC et Rue du Commerce.
+- [ ] Interface `Connector` commune et **connecteur générique JSON-LD** piloté par un fichier YAML
+      par site (domaine, pages de liste ou sitemap, débit, priorité). Ajouter un site ne demande plus de code.
+- [ ] Sites ajoutés par configuration : **Rue du Commerce** (découverte par le sitemap, pas de
+      pagination), **Electro Dépôt** (catégories sans tri ni filtre), **Alternate.fr** et
+      **Son-Vidéo.com** (après leur fiche site).
+- [ ] Identité produit : regroupement des offres par EAN pour comparer un même produit entre sites.
 - [ ] File de tâches (Redis + ARQ), workers parallèles et planification par priorité.
 - [ ] Santé des connecteurs : taux de succès, taux d'échec d'extraction, produits « canaris ».
       Si un site casse ou bloque, le connecteur se met en pause et une alerte est envoyée.
@@ -143,18 +145,27 @@ vraiment acheter depuis la France. Chaque nouveau site passe d'abord par le test
 [fiche site](JURIDIQUE.md#4-fiche-site-à-remplir-avant-tout-connecteur).
 
 ### Étape A : France
-- [ ] Materiel.net (fiche à faire) et autres sites accessibles dont les CGU le permettent.
+- [ ] Fiches et configuration des autres sites français de [SITES.md](SITES.md) : Brico Dépôt,
+      IKEA, Lidl, JouéClub, Gifi, Miliboo, puis ceux « à vérifier » (Materiel.net, Grosbill, Cybertek, Bureau Vallée).
+- [ ] **Connecteur API eBay** (compte développeur gratuit, 5 000 appels par jour) : eBay.fr d'abord,
+      vendeurs professionnels bien notés uniquement.
+- [ ] **Connecteur Shopify** et liste de boutiques françaises qui exposent `/products.json`.
 - [ ] Découverte de produits : sitemaps et pages catégories autorisées.
 - [ ] Planification adaptative : fréquence selon la valeur du produit, sa volatilité et l'historique d'erreurs du site.
 - [ ] **Signal secondaire pour les sites bloqués** (Cdiscount, Fnac, Darty…) : flux publics des
       communautés de bons plans (ex. Dealabs), filtrés sur les erreurs de prix.
 
 ### Étape B : Union européenne (pas de douane)
-- [ ] Tester puis ajouter les sites européens accessibles (Coolblue, Otto, puis d'autres pays).
+- [ ] Sites européens de [SITES.md](SITES.md) : **Alternate** (DE, NL), **Cyberport** (DE),
+      **Elgiganten** (SE, puis ses sites frères en DK, NO et FI), Lidl et IKEA (autres pays),
+      Morele (PL), Megekko (NL, 1 requête par heure au maximum), puis Coolblue, Otto, Mindfactory, Unieuro.
+- [ ] eBay et Shopify étendus aux autres pays de l'UE.
 - [ ] Conversion de devises, détection de la **livraison vers la France**.
 
 ### Étape C : Reste du monde
-- [ ] Tester puis ajouter des sites hors UE accessibles.
+- [ ] Sites hors UE de [SITES.md](SITES.md) : Overclockers et Scan (UK), Mwave, JB Hi-Fi et
+      Officeworks (AU), Canada Computers (CA).
+- [ ] eBay UK, US, AU, CA, boutiques Shopify du monde entier, API Rakuten (Japon) et Best Buy (US) si la clé est obtenue.
 - [ ] Calcul du **prix rendu en France** : livraison, TVA à l'importation, droits de douane selon
       la catégorie et la valeur (règles douanières de l'UE en évolution, à vérifier au moment du
       développement). Alerte seulement si l'offre reste intéressante une fois livrée.

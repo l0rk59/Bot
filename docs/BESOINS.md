@@ -8,6 +8,9 @@
 | Bot Telegram (via @BotFather) et un groupe privé | Recevoir les alertes | 0 | Gratuit |
 | Sentry | Suivre les erreurs du bot | 2 | Offre gratuite |
 | Healthchecks.io | Être prévenu si le bot s'arrête (ordinateur éteint, plantage) | 2 | Offre gratuite |
+| Compte développeur eBay | API eBay (tous pays), 5 000 appels par jour | 4 | Gratuit |
+| Identifiant Rakuten Web Service *(option)* | API Rakuten Ichiba (Japon) | 4, étape C | Gratuit |
+| Clé Best Buy *(option)* | API Best Buy (États-Unis) | 4, étape C | Gratuite, attribution incertaine |
 | Keepa API *(option C)* | Prix et historiques Amazon dans une dizaine de pays | Module Amazon | Environ 49 € par mois, résiliable chaque mois |
 | Clé d'API LLM *(option)* | Vérification des candidats ambigus | 5 | Quelques euros par mois, plafonnés |
 
@@ -55,7 +58,8 @@ On peut passer à B ou C à tout moment. Le module Amazon est prévu dans la
 
 ## 5. Données de départ
 
-- **Sites** : LDLC pour le MVP, puis Rue du Commerce et Electro Dépôt. Voir [SITES.md](SITES.md).
+- **Sites** : LDLC pour le MVP, puis une quarantaine de sources (sites JSON-LD, API eBay,
+  boutiques Shopify). Voir [SITES.md](SITES.md).
 - **Produits témoins** : 100 à 300 produits LDLC avec URL et EAN, de préférence chers (plus de
   100 €) et vendus aussi sur Rue du Commerce.
 - **Catégories prioritaires** : high-tech et informatique (le point fort des sites autorisés),
@@ -68,7 +72,7 @@ On peut passer à B ou C à tout moment. Le module Amazon est prévu dans la
 | 1 | Usage | ✅ Personnel uniquement |
 | 2 | Marchés | ✅ Monde entier, par étapes : France, puis UE, puis reste du monde |
 | 3 | Verticales | ✅ Produits d'abord |
-| 4 | Sites | ✅ LDLC (MVP), Rue du Commerce, Electro Dépôt. TopAchat exclu (CGU). Cdiscount et Fnac : signal secondaire |
+| 4 | Sites | ✅ LDLC (MVP), puis une quarantaine de sources (voir [SITES.md](SITES.md)). TopAchat, Costco et Target exclus (CGU). Cdiscount et Fnac : signal secondaire |
 | 5 | Canal d'alerte | ✅ Telegram |
 | 6 | Langage | ✅ Python |
 | 7 | Achat automatique | ✅ Non |
