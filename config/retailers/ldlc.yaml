@@ -1,0 +1,63 @@
+# LDLC : voir docs/sites/ldlc.md (CGU lues, robots.txt respecté).
+#
+# La page 1 de chaque catégorie contient ses 48 produits et leurs prix (JSON-LD ItemList) :
+# une seule requête donne 48 prix. Les pages suivantes chargent leurs prix en JavaScript
+# depuis /stock-price/, que robots.txt interdit aux robots : on ne lit donc que la page 1.
+# Pour couvrir plus de produits, on ajoute des catégories plutôt que des pages.
+id: ldlc
+name: LDLC
+base_url: https://www.ldlc.com
+enabled: true
+country: FR
+currency: EUR
+
+# Au plus une requête toutes les 5 secondes : 32 catégories ≈ 3 minutes par passage.
+min_interval_seconds: 5
+
+# Vendeur « maison » : les autres vendeurs sont signalés comme vendeurs tiers.
+own_seller_names: ["LDLC"]
+
+# Catégories vérifiées le 5 novembre 2026 (page 1 avec prix).
+listings:
+  # Image et son
+  - url: https://www.ldlc.com/image-son/television/tv-ecran-plat/c4402/
+  - url: https://www.ldlc.com/image-son/projection/videoprojecteur/c4377/
+  - url: https://www.ldlc.com/image-son/home-cinema-hi-fi/barre-de-son/c4335/
+  - url: https://www.ldlc.com/image-son/home-cinema-hi-fi/enceintes-hi-fi/c4340/
+  - url: https://www.ldlc.com/image-son/photo/hybride/c4363/
+  - url: https://www.ldlc.com/image-son/photo/compact-numerique/c4360/
+  # Ordinateurs
+  - url: https://www.ldlc.com/informatique/ordinateur-portable/pc-portable/c4265/
+  - url: https://www.ldlc.com/informatique/ordinateur-portable/portable-mac/c4266/
+  - url: https://www.ldlc.com/informatique/ordinateur-de-bureau/pc-de-marque/c4250/
+  - url: https://www.ldlc.com/informatique/tablette/tablette/c4271/
+  - url: https://www.ldlc.com/informatique/peripherique-pc/moniteur-pc/c4623/
+  # Composants
+  - url: https://www.ldlc.com/informatique/pieces-informatique/carte-graphique-interne/c4684/
+  - url: https://www.ldlc.com/informatique/pieces-informatique/carte-professionnelle/c4685/
+  - url: https://www.ldlc.com/informatique/pieces-informatique/processeur/c4300/
+  - url: https://www.ldlc.com/informatique/pieces-informatique/carte-mere/c4293/
+  - url: https://www.ldlc.com/informatique/pieces-informatique/memoire-pc/c4703/
+  - url: https://www.ldlc.com/informatique/pieces-informatique/disque-ssd/c4698/
+  - url: https://www.ldlc.com/informatique/pieces-informatique/disque-dur-interne/c4697/
+  - url: https://www.ldlc.com/informatique/pieces-informatique/boitier-pc/c4678/
+  # Périphériques gaming
+  - url: https://www.ldlc.com/informatique/peripherique-pc/clavier-gamer/c4594/
+  - url: https://www.ldlc.com/informatique/peripherique-pc/souris-gamer/c4600/
+  # Téléphonie et objets connectés
+  - url: https://www.ldlc.com/telephonie/telephonie-portable/mobile-smartphone/c4416/
+  - url: https://www.ldlc.com/objets-connectes/loisirs/montre-connectee/c5962/
+  - url: https://www.ldlc.com/objets-connectes/loisirs/drone/c7412/
+  - url: https://www.ldlc.com/objets-connectes/maison/robot-et-aspirateur/c7775/
+  - url: https://www.ldlc.com/objets-connectes/maison/station-electrique-portable/c9195/
+  - url: https://www.ldlc.com/objets-connectes/securite/camera-de-surveillance/c5998/
+  # Consoles
+  - url: https://www.ldlc.com/jeux-loisirs/console/console-ps5/c7865/
+  - url: https://www.ldlc.com/jeux-loisirs/console/console-xbox-series/c7866/
+  - url: https://www.ldlc.com/jeux-loisirs/console/console-nintendo-switch-2/c8510/
+  - url: https://www.ldlc.com/jeux-loisirs/console/console-nintendo-switch/c7600/
+  - url: https://www.ldlc.com/jeux-loisirs/console/autres-consoles/c7763/
+
+# Fiches produit à suivre en plus des catégories (une URL par ligne), par exemple :
+#   - https://www.ldlc.com/fiche/PB00762508.html
+products: []

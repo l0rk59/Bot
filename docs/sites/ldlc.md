@@ -8,7 +8,10 @@
 - [ ] Flux produits d'affiliation ? → Non étudié (usage personnel)
 - [x] Données structurées JSON-LD `Product`/`Offer` sur les pages produit ? → Oui : prix et **EAN**
 - [x] Prix visible sans JavaScript ? → Oui
-- [x] Pages de liste exploitables ? → Oui : pages catégories (`/…/c<id>/`) autorisées par `robots.txt`
+- [x] Pages de liste exploitables ? → **Page 1 uniquement** : elle contient ses 48 produits et
+      leurs prix (JSON-LD `ItemList`). Les pages suivantes chargent les prix en JavaScript depuis
+      `/stock-price/`, chemin interdit par `robots.txt`. On couvre donc plus de produits en
+      ajoutant des catégories (32 vérifiées, environ 1 400 prix par passage).
 - [ ] Sitemap produits disponible ? → Non annoncé dans `robots.txt`, à vérifier
 
 ## Cadre
@@ -32,5 +35,5 @@
 
 ## Décision
 - [x] **OK pour collecte** (usage personnel, débit faible, aucune republication)
-- **Site retenu pour le MVP** : données structurées complètes avec EAN, pages de liste
-  autorisées (pagination comprise), vente en propre.
+- **Site retenu pour le MVP** : données structurées complètes avec EAN, page 1 des catégories
+  exploitable, vente en propre. Configuration : `config/retailers/ldlc.yaml`.

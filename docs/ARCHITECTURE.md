@@ -192,98 +192,98 @@ Téléviseur OLED 55" Marque X (EAN 1234567890123)
 
 ## 11. Stack technique
 
+État au MVP : ✅ = utilisé aujourd'hui, ⏳ = prévu dans une phase suivante.
+
 | Besoin | Choix recommandé | Alternatives |
 |---|---|---|
-| Langage | **Python 3.12+** (meilleur écosystème pour la collecte et l'analyse de données) | – |
-| Outillage | uv, ruff, mypy, pytest, pre-commit | Poetry |
-| HTTP | httpx (asynchrone) | aiohttp |
-| Navigateur | Playwright | – |
-| Analyse HTML | selectolax ou parsel | BeautifulSoup |
-| Données structurées | extruct | – |
-| `robots.txt` | protego | – |
-| Modèles | Pydantic v2 | – |
-| Base de données | PostgreSQL (SQLite possible pour le MVP) | – |
-| ORM et migrations | SQLAlchemy 2 et Alembic | SQLModel |
-| File de tâches | Redis et ARQ | Celery, Dramatiq |
-| Telegram | aiogram 3 | python-telegram-bot |
-| API et tableau de bord | FastAPI (avec HTMX ou un petit front) | Django |
-| Supervision | structlog, Sentry | Prometheus et Grafana |
-| Déploiement | Docker Compose sur l'ordinateur personnel (option A), puis un VPS si besoin. GitHub Actions pour la CI | – |
-| Surveillance de disponibilité | Healthchecks.io (offre gratuite) : prévient si le bot ne donne plus signe de vie | – |
+| Langage | ✅ **Python 3.12+** (meilleur écosystème pour la collecte et l'analyse de données) | – |
+| Outillage | ✅ uv, ruff, mypy, pytest | Poetry |
+| HTTP | ✅ httpx (asynchrone) | aiohttp |
+| Navigateur | ⏳ Playwright (captures d'écran, sites en JavaScript) | – |
+| Analyse HTML | ✅ selectolax (moteur lexbor) | parsel, BeautifulSoup |
+| Données structurées | ✅ extracteur JSON-LD maison (`extract.py`), plus léger qu'extruct | extruct |
+| `robots.txt` | ✅ protego | – |
+| Modèles et réglages | ✅ Pydantic v2, pydantic-settings (fichier `.env`) | – |
+| Base de données | ✅ SQLite (MVP), ⏳ PostgreSQL | – |
+| ORM et migrations | ⏳ SQLAlchemy 2 et Alembic (requêtes SQL directes au MVP) | SQLModel |
+| File de tâches | ⏳ Redis et ARQ (boucle asyncio simple au MVP) | Celery, Dramatiq |
+| Telegram | ✅ API Bot appelée avec httpx (MVP), ⏳ aiogram 3 pour les boutons de retour | python-telegram-bot |
+| API et tableau de bord | ⏳ FastAPI (avec HTMX ou un petit front) | Django |
+| Supervision | ✅ journal `data/pricebot.log`, ⏳ structlog, Sentry | Prometheus et Grafana |
+| Déploiement | ✅ directement sous Windows (MVP), ⏳ Docker Compose, puis un VPS si besoin. ✅ CI GitHub Actions (Linux et Windows) | – |
+| Surveillance de disponibilité | ✅ Healthchecks.io (offre gratuite, optionnel) : prévient si le bot ne donne plus signe de vie | – |
 
 Pour un balayage à grande échelle, Scrapy est une alternative crédible à httpx avec un
 planificateur maison : limitation de débit intégrée, respect de `robots.txt`, pipelines.
 
-## 12. Structure du dépôt (cible)
+## 12. Structure du dépôt
+
+### Aujourd'hui (MVP)
 
 ```text
 .
-├── pyproject.toml
-├── docker-compose.yml
-├── Dockerfile
-├── .env.example
-├── config/
-│   ├── retailers/              # un fichier YAML par site
-│   └── detection.yaml          # seuils et poids
+├── pyproject.toml / uv.lock     # dépendances (uv)
+├── .env.example                 # modèle de réglages (le vrai .env n'est jamais committé)
+├── .github/workflows/ci.yml     # ruff, mypy, pytest sous Linux et Windows
+├── config/retailers/            # un fichier YAML par site (ldlc.yaml, fake-shop.yaml)
 ├── src/pricebot/
-│   ├── cli.py                  # pricebot run | check <url> | backtest
-│   ├── settings.py
-│   ├── domain/                 # modèles Pydantic : RawOffer, Offer, Anomaly…
-│   ├── fetch/                  # client HTTP, limitation de débit, robots.txt, Playwright
-│   ├── extract/                # JSON-LD, microdata, OpenGraph, sélecteurs
-│   ├── connectors/
-│   │   ├── base.py             # interface Connector
-│   │   ├── jsonld.py           # connecteur générique, piloté par config/retailers/*.yaml
-│   │   ├── shopify.py          # toutes les boutiques Shopify
-│   │   ├── ebay.py             # API eBay (Browse API)
-│   │   └── keepa.py            # Amazon, si option C
-│   ├── normalize/              # devises, EAN, état, vendeur
-│   ├── storage/                # SQLAlchemy, dépôts, migrations Alembic
-│   ├── scheduler/
-│   ├── detection/              # références, signaux, score, vérification
-│   ├── alerts/                 # telegram, discord, email
-│   ├── monitoring/             # santé des connecteurs, canaris
-│   └── api/                    # tableau de bord (phase 6)
-├── tests/
-│   ├── fixtures/html/          # pages enregistrées pour tester les extracteurs
-│   ├── fake_shop/              # faux magasin local pour les tests de bout en bout
-│   └── ...
+│   ├── cli.py                   # pricebot run | check | stats | telegram-test | fake-shop
+│   ├── settings.py              # réglages lus dans .env
+│   ├── models.py                # RawOffer, Availability, Condition
+│   ├── prices.py                # lecture et mise en forme des prix (Decimal)
+│   ├── http.py                  # client poli : débit, robots.txt, nouvelles tentatives
+│   ├── extract.py               # JSON-LD / OpenGraph → offres
+│   ├── retailers.py             # chargement et validation des YAML
+│   ├── storage.py               # SQLite : offres, historique, anomalies
+│   ├── detection.py             # prix habituel, règles, verdict
+│   ├── alerts.py                # Telegram et console
+│   ├── engine.py                # un passage : collecte → détection → vérification → alerte
+│   └── fake_shop.py             # faux magasin pour les tests et la démo
+├── tests/                       # 103 tests, sans accès aux vrais sites
+│   └── fixtures/                # pages d'exemple synthétiques (aucune copie de vrai site)
 └── docs/
 ```
 
+### Cible (phases 2 et suivantes)
+
+Les modules deviennent des paquets quand ils grossissent : `connectors/` (JSON-LD générique,
+Shopify, API eBay, Keepa), `storage/` (SQLAlchemy et Alembic), `monitoring/` (santé des
+connecteurs, canaris), `api/` (tableau de bord éventuel).
+
 ## 13. Configuration et secrets
 
-- Les secrets (`TELEGRAM_BOT_TOKEN`, `DATABASE_URL`, clés d'API) sont dans `.env`, qui n'est
-  **jamais committé**. Un fichier `.env.example` sans valeurs sert de modèle.
-- Un fichier YAML par site :
+- Les secrets (`PRICEBOT_TELEGRAM_TOKEN`, puis les clés d'API) sont dans `.env`, qui n'est
+  **jamais committé**. Un fichier `.env.example` sans valeurs sert de modèle. Le journal
+  n'affiche jamais l'URL de l'API Telegram, qui contient le jeton.
+- Un fichier YAML par site, validé au démarrage (une clé inconnue ou un débit trop rapide pour
+  un vrai site est refusé) :
 
 ```yaml
-id: exemple-shop
+id: exemple-shop                 # identifiant (option --only)
 name: Exemple Shop
-domain: www.exemple-shop.fr
+base_url: https://www.exemple-shop.fr
+enabled: true
 country: FR
 currency: EUR
-enabled: true
-rate_limit:
-  min_interval_seconds: 2      # au plus 1 requête toutes les 2 s
-  max_concurrency: 1
-render_js: false
-extraction: [jsonld, microdata, opengraph, selectors]
-selectors:                      # secours si les données structurées manquent
-  price: "span.product-price"
-  title: "h1"
-legal:                          # repris de la fiche site
-  robots_txt_checked: 2026-11-05
-  tos_reviewed: 2026-11-05
-  notes: "Pas d'interdiction explicite de la collecte automatisée"
+min_interval_seconds: 5          # au plus 1 requête toutes les 5 s (minimum 1 s)
+own_seller_names: ["Exemple Shop"]  # les autres vendeurs sont signalés comme tiers
+page_url_template: "{url}page{page}/"  # facultatif : pagination des catégories
+listings:                        # pages catégories à parcourir
+  - url: https://www.exemple-shop.fr/tv/c123/
+    max_pages: 2
+products:                        # fiches produit à suivre en plus
+  - https://www.exemple-shop.fr/fiche/P1.html
 ```
+
+Prévu plus tard dans ce format : rendu JavaScript, sélecteurs CSS de secours, informations
+reprises de la fiche site.
 
 ## 14. Stratégie de tests
 
 | Niveau | Contenu |
 |---|---|
 | Unitaires | Lecture des prix (formats FR), validation EAN, calcul des signaux et du score |
-| Extracteurs | Pages HTML réelles enregistrées dans `tests/fixtures`, avec le résultat attendu |
+| Extracteurs | Pages d'exemple synthétiques dans `tests/fixtures` (structure des vrais sites, sans copie de leur contenu), avec le résultat attendu |
 | Détection | Séries de prix synthétiques : promo normale, virgule décalée, bruit, rupture de stock |
 | Bout en bout | Faux magasin local dont on change les prix, puis vérification de l'alerte reçue |
 | Rejeu (backtest) | Historique réel rejoué avec de nouveaux paramètres, puis mesure de la précision et du rappel |

@@ -1,0 +1,12 @@
+# Faux magasin de démonstration (commande : pricebot fake-shop).
+# Désactivé par défaut. Pour l'utiliser : pricebot run --only fake-shop --interval 0.5
+id: fake-shop
+name: Faux magasin (démo)
+base_url: http://127.0.0.1:8765
+enabled: false
+min_interval_seconds: 0.2
+own_seller_names: ["Faux magasin"]
+page_url_template: "{url}page{page}/"
+listings:
+  - url: http://127.0.0.1:8765/categorie/
+    max_pages: 2

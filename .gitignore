@@ -1,0 +1,27 @@
+# Secrets : ne jamais committer
+.env
+
+# Données locales du bot (base SQLite, journaux)
+data/
+*.sqlite3
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Outils
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Systèmes
+.DS_Store
+Thumbs.db
+desktop.ini

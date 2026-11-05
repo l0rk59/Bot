@@ -56,13 +56,15 @@ d'alertes notées). Pendant ce temps, le développement continue sur la phase su
       [Electro Dépôt](sites/electrodepot.md), [TopAchat](sites/topachat.md) (exclu).
 - [x] Choisir le site du MVP : **LDLC**.
 - [ ] Créer le bot Telegram (BotFather) et un groupe privé (voir [BESOINS.md](BESOINS.md#7-à-faire-de-votre-côté)).
-- [ ] Préparer l'ordinateur : Python 3.12+, Docker, Git, mise en veille désactivée.
-- [ ] Initialiser le dépôt : `pyproject.toml` (uv), ruff, mypy, pytest, pre-commit, CI GitHub
-      Actions, `.gitignore`, `.env.example`, `Dockerfile`, `docker-compose.yml`.
-- [ ] Constituer une liste de **100 à 300 produits témoins** LDLC (URL et EAN), de
-      préférence chers (plus de 100 €) et vendus aussi sur Rue du Commerce, pour pouvoir les comparer.
+- [ ] Préparer l'ordinateur Windows : Git, uv (qui installe Python), mise en veille désactivée
+      (voir le [README](../README.md#installation-sous-windows)).
+- [x] Initialiser le dépôt : `pyproject.toml` (uv), ruff, mypy, pytest, CI GitHub Actions
+      (Linux et Windows), `.gitignore`, `.env.example`. Docker est reporté à la phase 2 : le MVP
+      tourne directement sous Windows avec SQLite.
+- [x] ~~Liste de produits témoins~~ : remplacée par **32 catégories LDLC** dont la page 1 contient
+      ses 48 prix, soit environ 1 400 produits suivis sans liste à tenir à la main.
 
-**Critère de fin** : la CI passe sur le squelette de projet et `pricebot --help` fonctionne.
+**Critère de fin** : ✅ la CI passe et `pricebot --help` fonctionne.
 
 ---
 
@@ -70,23 +72,33 @@ d'alertes notées). Pendant ce temps, le développement continue sur la phase su
 
 **Objectif** : faire tourner toute la chaîne de bout en bout sur un seul site.
 
-- [ ] Client HTTP asynchrone : au plus 1 requête toutes les 5 s par site, User-Agent
-      identifiable, délais d'attente, nouvelles tentatives espacées progressivement, `robots.txt` respecté (protego).
-- [ ] Extracteur générique de données structurées (JSON-LD, microdata, OpenGraph) qui renvoie
-      le prix, la devise, la disponibilité, l'EAN et le titre.
-- [ ] Connecteur LDLC : pages produit et pages catégories.
-- [ ] Stockage SQLite : produits, offres, observations de prix (seulement quand le prix change).
-- [ ] Planificateur simple : chaque offre est revérifiée toutes les N minutes.
-- [ ] Une seule règle de détection : prix inférieur à 50 % de la médiane des observations
-      précédentes, **ou** virgule décalée (×10 ou ×100).
-- [ ] Alerte Telegram : produit, ancien prix, nouveau prix, pourcentage de baisse, lien.
-- [ ] **Faux magasin local** dont on modifie les prix à volonté, pour tester sans toucher à LDLC.
-- [ ] Tests : extraction sur des pages LDLC enregistrées (fixtures), détection sur des séries de prix synthétiques.
+- [x] Client HTTP asynchrone (`http.py`) : au plus 1 requête toutes les 5 s par site, User-Agent
+      identifiable, délais d'attente, nouvelles tentatives espacées (`Retry-After` respecté),
+      `robots.txt` respecté avec ses jokers (protego), arrêt immédiat sur un refus 401/403.
+- [x] Extracteur générique (`extract.py`) : JSON-LD (`Product`, `ItemList`, `ProductGroup`,
+      `@graph`), repli OpenGraph. Prix, devise, prix barré, stock, état, vendeur, EAN, marque.
+- [x] Connecteur LDLC par configuration (`config/retailers/ldlc.yaml`) : 32 catégories, page 1
+      uniquement (les pages suivantes chargent leurs prix depuis un chemin interdit par `robots.txt`).
+- [x] Stockage SQLite (`storage.py`) : offres, observations de prix (seulement quand le prix ou
+      le stock change), anomalies.
+- [x] Planificateur simple : un passage toutes les N minutes (`pricebot run`).
+- [x] Détection (`detection.py`) : prix habituel = **médiane pondérée par la durée** sur 30 jours ;
+      alerte si prix ≤ 50 % de ce prix **ou** virgule décalée (×10, ×100, ×1000) **ou** prix
+      symbolique, avec au moins 30 € d'économie. Pas d'alerte sur un produit en rupture.
+- [x] **Vérification sur la fiche produit** (avancée de la phase 3) : un prix anormal lu sur une
+      liste est relu sur la fiche ; s'il n'est pas confirmé, la fausse alerte est écartée.
+- [x] Alerte Telegram : produit, prix, prix habituel, baisse, raisons, vendeur (tiers signalé),
+      stock, état, EAN, lien. Une seule alerte par épisode, puis un message de fin d'erreur.
+- [x] **Faux magasin local** (`pricebot fake-shop`) dont on modifie les prix depuis le navigateur.
+- [x] Tests (103) : extraction sur des pages d'exemple, détection, stockage, client HTTP,
+      alertes, moteur de bout en bout et commande `pricebot` face au faux magasin.
+- [x] Bonus : battement de cœur Healthchecks.io optionnel, journal dans `data/pricebot.log`.
 
-**Livrables** : la commande `pricebot run` tourne sur l'ordinateur et envoie des alertes.
+**Livrables** : ✅ la commande `pricebot run` tourne et envoie des alertes. Premier passage réel
+sur LDLC le 5 novembre 2026 : 487 offres lues sur 13 catégories, sans erreur.
 
-**Critère de fin** : une baisse de prix sur le faux magasin déclenche une alerte Telegram en
-moins de N + 1 minutes. Le bot tourne 48 h sur LDLC sans planter.
+**Critère de fin** : ✅ une baisse de prix sur le faux magasin déclenche une alerte au passage
+suivant (testé automatiquement). ⏳ Reste à faire tourner le bot 48 h sur LDLC depuis l'ordinateur Windows.
 
 ---
 
