@@ -6,48 +6,41 @@
 |---|---|---|---|
 | GitHub (déjà en place) | Code, CI | 0 | Gratuit |
 | Bot Telegram (via @BotFather) et un groupe privé | Recevoir les alertes | 0 | Gratuit |
-| **Keepa API** | Prix et historiques Amazon dans une dizaine de pays | 2 | **Environ 49 € par mois** (formule d'entrée, à confirmer sur keepa.com/api), résiliable chaque mois |
-| Serveur allumé 24 h/24 | Faire tourner le bot | 2 | 0 € (ordinateur personnel) ou environ 5 € par mois (VPS) |
-| Sentry | Suivre les erreurs | 2 | Offre gratuite suffisante |
-| Clé d'API LLM *(option)* | Vérification des candidats ambigus | 5 | À l'usage, avec un plafond (quelques euros par mois) |
+| Sentry | Suivre les erreurs du bot | 2 | Offre gratuite |
+| Healthchecks.io | Être prévenu si le bot s'arrête (ordinateur éteint, plantage) | 2 | Offre gratuite |
+| Keepa API *(option C)* | Prix et historiques Amazon dans une dizaine de pays | Module Amazon | Environ 49 € par mois, résiliable chaque mois |
+| Clé d'API LLM *(option)* | Vérification des candidats ambigus | 5 | Quelques euros par mois, plafonnés |
 
 Les réseaux d'affiliation (Awin…) et l'API officielle d'Amazon sont écartés : ils demandent un
 site ou des ventes générées, ce qui ne correspond pas à un usage personnel (voir [SITES.md](SITES.md)).
 
-## 2. Infrastructure
+## 2. L'ordinateur (option A)
 
-| Stade | Machine | Services |
-|---|---|---|
-| Phases 0 et 1 | Ordinateur personnel (Python 3.12+, Docker) | SQLite ou PostgreSQL en Docker |
-| Phase 2 et suivantes | VPS 2 vCPU, 4 Go de RAM (ou ordinateur allumé en permanence) | PostgreSQL, Redis, workers, bot Telegram |
-| Si beaucoup de pages en JavaScript | VPS 4 vCPU, 8 Go de RAM | Idem, plus de workers |
+Le bot tourne sur l'ordinateur personnel. Il faut :
 
-Sauvegarde quotidienne de la base (`pg_dump`) stockée hors du serveur.
+| Élément | Minimum |
+|---|---|
+| Mémoire vive | 8 Go (16 Go confortable : PostgreSQL, Redis et un navigateur sans interface tournent en parallèle) |
+| Disque libre | 10 Go |
+| Logiciels | Python 3.12+, Git, Docker (Docker Desktop sous Windows et macOS) |
+| Réglages | **Mise en veille désactivée**, Docker lancé au démarrage, redémarrage automatique après une mise à jour système |
+| Connexion | Une connexion domestique suffit (le bot fait peu de requêtes) |
 
-## 3. Budget : pourquoi et combien
+Le bot consomme peu : environ une requête toutes les 5 secondes par site.
 
-Le budget, c'est ce que le bot coûte **chaque mois** pour fonctionner. Deux postes seulement :
+Si l'ordinateur est souvent éteint, on peut passer à l'option B (petit serveur loué, environ
+5 € par mois) sans rien changer au code : c'est le même `docker-compose.yml`.
 
-**1. Une machine allumée 24 h/24.** Les erreurs de prix sont souvent corrigées en quelques
-minutes ou quelques heures. Si le bot ne tourne que quand l'ordinateur est allumé, il rate la
-plupart d'entre elles. Deux possibilités :
-- l'ordinateur personnel, laissé allumé en permanence : gratuit, mais le bot s'arrête à chaque extinction ou coupure ;
-- un petit serveur loué (VPS, ex. Hetzner, OVH) : **environ 5 € par mois**, toujours allumé.
-
-**2. L'accès aux données d'Amazon.** Amazon interdit les robots sur son site. La voie propre
-est l'API Keepa, qui suit Amazon dans une dizaine de pays : **environ 49 € par mois**. C'est le principal poste de dépense.
-
-Tous les autres sites accessibles (LDLC, Rue du Commerce, TopAchat…) sont gratuits.
+## 3. Budget : option A retenue (0 €)
 
 | Option | Contenu | Coût mensuel |
 |---|---|---|
-| **A. Gratuit** | Ordinateur personnel, sites accessibles uniquement, **pas d'Amazon** | 0 € |
-| **B. Serveur** | VPS, sites accessibles uniquement, **pas d'Amazon** | environ 5 € |
-| **C. Complet** | VPS, sites accessibles **et Amazon dans une dizaine de pays** | environ 55 € |
+| **A. Gratuit** ✅ | Ordinateur personnel, sites autorisés uniquement, pas d'Amazon | 0 € |
+| B. Serveur | VPS, sites autorisés uniquement, pas d'Amazon | environ 5 € |
+| C. Complet | VPS, sites autorisés et Amazon dans une dizaine de pays (Keepa) | environ 55 € |
 
-**Recommandation** : commencer gratuitement (option A) pendant la phase 1, le temps de voir le
-bot fonctionner. Passer à l'option C au début de la phase 2. Keepa se résilie à tout moment :
-si les résultats ne suivent pas, on arrête.
+On peut passer à B ou C à tout moment. Le module Amazon est prévu dans la
+[roadmap](ROADMAP.md#module-optionnel--amazon-via-keepa).
 
 ## 4. Compétences
 
@@ -56,29 +49,41 @@ si les résultats ne suivent pas, on arrête.
 | Python, y compris `async`/`await` | Tout le projet | Intermédiaire |
 | HTML, sélecteurs CSS, outils de développement du navigateur | Écrire et réparer les extracteurs | Intermédiaire |
 | SQL et PostgreSQL | Historique, requêtes d'analyse | Bases |
-| Git, Docker, Linux | Déploiement, serveur | Bases |
+| Git et Docker | Lancer et mettre à jour le bot | Bases |
 | Statistiques simples (médiane, percentiles, MAD) | Détection | Bases |
 | Apprentissage automatique | Phase 5 | Notions, à apprendre en cours de route |
 
 ## 5. Données de départ
 
-- **Sites** : voir [SITES.md](SITES.md). Pour le MVP : LDLC ou Rue du Commerce.
-- **Produits témoins** : 100 à 300 produits avec URL et EAN, de préférence chers (plus de
-  100 €) et vendus à la fois sur Amazon et sur les sites accessibles.
-- **Catégories prioritaires** : high-tech (là où les sites accessibles sont les plus forts),
-  électroménager, jeux vidéo et jouets, maison.
+- **Sites** : LDLC pour le MVP, puis Rue du Commerce et Electro Dépôt. Voir [SITES.md](SITES.md).
+- **Produits témoins** : 100 à 300 produits LDLC avec URL et EAN, de préférence chers (plus de
+  100 €) et vendus aussi sur Rue du Commerce.
+- **Catégories prioritaires** : high-tech et informatique (le point fort des sites autorisés),
+  puis électroménager.
 
 ## 6. Décisions
 
 | # | Question | Réponse |
 |---|---|---|
-| 1 | Usage | ✅ **Personnel uniquement** |
-| 2 | Marchés | ✅ **Monde entier**, par étapes : France, puis UE, puis reste du monde |
-| 3 | Verticales | ✅ **Produits d'abord** |
-| 4 | Sites | ✅ Amazon (via Keepa) et sites accessibles. Cdiscount et Fnac bloquent les robots : signal secondaire seulement |
+| 1 | Usage | ✅ Personnel uniquement |
+| 2 | Marchés | ✅ Monde entier, par étapes : France, puis UE, puis reste du monde |
+| 3 | Verticales | ✅ Produits d'abord |
+| 4 | Sites | ✅ LDLC (MVP), Rue du Commerce, Electro Dépôt. TopAchat exclu (CGU). Cdiscount et Fnac : signal secondaire |
 | 5 | Canal d'alerte | ✅ Telegram |
 | 6 | Langage | ✅ Python |
 | 7 | Achat automatique | ✅ Non |
-| 8 | **Budget** | ⏳ Option A, B ou C (section 3). Recommandation : A pour la phase 1, puis C |
-| 9 | **Temps disponible par semaine** | ⏳ À préciser, pour recalibrer les durées |
+| 8 | Budget | ✅ Option A (0 €) |
+| 9 | Temps disponible | ✅ Plein temps |
 | 10 | Seuil minimal d'une alerte | Proposé : baisse d'au moins 50 % **et** au moins 30 € d'économie (réglable) |
+
+## 7. À faire de votre côté
+
+1. **Créer le bot Telegram** (5 minutes) :
+   - dans Telegram, ouvrir une conversation avec **@BotFather** et envoyer `/newbot` ;
+   - choisir un nom, puis un identifiant qui finit par `bot` ;
+   - BotFather renvoie un **jeton** (token). Le garder secret : il ira dans le fichier `.env`
+     de l'ordinateur, **jamais** dans le dépôt GitHub ni dans une conversation ;
+   - créer un groupe privé, y ajouter le bot, et y envoyer un premier message.
+2. **Indiquer le système d'exploitation** de l'ordinateur (Windows, macOS ou Linux), pour adapter
+   les instructions d'installation.
+3. **Désactiver la mise en veille** de l'ordinateur (l'écran peut s'éteindre, pas la machine).

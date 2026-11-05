@@ -34,15 +34,20 @@ puis, si elle passe, sur une page produit pour vérifier la présence de donnée
 
 ### Accessibles : candidats pour les connecteurs
 
-| Site | Pays | Résultat | Données structurées |
-|---|---|---|---|
-| **LDLC** | FR | ✅ Accueil et page produit | JSON-LD `Product` avec prix et **EAN** |
-| **Rue du Commerce** | FR | ✅ Page de liste (47 produits) et page produit | JSON-LD `Product` avec prix et **EAN** |
-| **TopAchat** | FR | ✅ Accueil et page produit | JSON-LD `Product` avec prix, sans EAN |
-| **Electro Dépôt** | FR | ✅ Accueil et page produit | JSON-LD `Product` avec prix, sans EAN |
-| Materiel.net | FR | ✅ Accueil et page de liste | À vérifier (même groupe que LDLC) |
-| Coolblue | NL/BE | ✅ Accueil | À vérifier |
-| Otto | DE | ✅ Accueil | À vérifier |
+| Site | Pays | Résultat | Données structurées | CGU | Décision |
+|---|---|---|---|---|---|
+| **[LDLC](sites/ldlc.md)** | FR | ✅ Accueil et page produit | JSON-LD avec prix et **EAN** | Pas de clause anti-extraction | ✅ **MVP** |
+| **[Rue du Commerce](sites/rueducommerce.md)** | FR | ✅ Page de liste (47 produits) et page produit | JSON-LD avec prix et **EAN** | Pas de clause anti-extraction | ✅ Phase 2 |
+| **[Electro Dépôt](sites/electrodepot.md)** | FR | ✅ Accueil et page produit | JSON-LD avec prix, sans EAN | Pas de clause anti-extraction | ✅ Phase 2 |
+| Materiel.net | FR | ✅ Accueil et page de liste | À vérifier | À lire (Groupe LDLC) | ⏳ |
+| Coolblue | NL/BE | ✅ Accueil | À vérifier | À lire | ⏳ Phase 4 |
+| Otto | DE | ✅ Accueil | À vérifier | À lire | ⏳ Phase 4 |
+
+### Accessibles mais exclus par leurs CGU
+
+| Site | Pays | Raison |
+|---|---|---|
+| [TopAchat](sites/topachat.md) | FR | Les CGU interdisent explicitement « toute extraction […] ou aspiration de données (scraping) » |
 
 ### Accessibles mais protégés : blocage probable
 
@@ -76,9 +81,10 @@ puis, si elle passe, sur une page produit pour vérifier la présence de donnée
 
 La plupart des grandes enseignes françaises bloquent les robots. La couverture réaliste repose sur trois sources :
 
-1. **Amazon, dans une dizaine de pays, via Keepa** : la source la plus riche en erreurs de prix.
-2. **Les sites accessibles**, surtout en high-tech (LDLC, Materiel.net, TopAchat, Rue du
-   Commerce, Electro Dépôt), là où les erreurs rapportent le plus.
+1. **Amazon, dans une dizaine de pays, via Keepa** : la source la plus riche en erreurs de
+   prix. Nécessite l'option de budget C, donc **pas pour l'instant** (option A retenue).
+2. **Les sites accessibles dont les CGU ne l'interdisent pas**, surtout en high-tech (LDLC,
+   Rue du Commerce, Electro Dépôt, peut-être Materiel.net), là où les erreurs rapportent le plus.
 3. **Les communautés de bons plans** comme signal secondaire pour les sites bloqués (Cdiscount,
    Fnac, Darty…). L'erreur y est déjà publique, mais on est quand même alerté.
 

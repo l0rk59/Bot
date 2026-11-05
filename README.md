@@ -4,8 +4,8 @@ Bot qui surveille en continu les prix des sites marchands, repère les **erreurs
 (prix anormalement bas causés par une erreur du marchand : virgule décalée, remise mal
 saisie, mauvaise devise, prix d'un autre produit…) et envoie une alerte en quelques minutes.
 
-> **Statut : phase 0, cadrage.** Le code n'est pas encore commencé. Ce dépôt contient la
-> roadmap et les spécifications à valider avant le développement.
+> **Statut : phase 0, cadrage presque terminé.** Les décisions sont prises et les sites vérifiés. Le code n'est pas encore commencé. Ce dépôt contient la
+> roadmap et les spécifications du bot.
 
 ## Documentation
 

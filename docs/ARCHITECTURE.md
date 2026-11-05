@@ -38,7 +38,7 @@ Par ordre de préférence :
 
 | Source | Avantages | Inconvénients | Usage |
 |---|---|---|---|
-| **API de données** (Keepa pour Amazon) | Fiable, structurée, autorisée, plusieurs pays, historique inclus | Payante, quota de jetons | **Source Amazon** (voir [SITES.md](SITES.md)) |
+| **API de données** (Keepa pour Amazon) | Fiable, structurée, autorisée, plusieurs pays, historique inclus | Payante, quota de jetons | **Source Amazon** si l'option de budget C est choisie (voir [SITES.md](SITES.md)) |
 | **API officielle** (ex. Creators API d'Amazon) | Fiable, structurée, autorisée | Réservée aux affiliés qui génèrent des ventes | Écartée pour un usage personnel |
 | **Flux produits d'affiliation** (Awin, Effiliation, Kwanko, Rakuten…) | Catalogue complet avec EAN, autorisé | Inscription avec un site ou une chaîne, mise à jour souvent quotidienne | Écartés pour un usage personnel |
 | **Données structurées des pages** (JSON-LD schema.org `Product`/`Offer`) | Résiste aux refontes visuelles, une seule méthode pour beaucoup de sites | Il faut récupérer la page | Collecte principale par défaut |
@@ -73,7 +73,8 @@ produit**. Une baisse repérée sur une liste déclenche immédiatement une vér
 - Nouvelles tentatives avec attente croissante sur les erreurs 5xx et 429, en respectant l'en-tête `Retry-After`.
 - Limite de débit par domaine (token bucket) et requêtes conditionnelles (`ETag`, `If-Modified-Since`).
 - User-Agent identifiable, avec une URL de contact.
-- `robots.txt` lu, mis en cache et respecté.
+- `robots.txt` lu, mis en cache et respecté, avec `protego`. Le module standard de Python
+  (`urllib.robotparser`) ne gère pas les jokers `*` qu'utilisent LDLC, Rue du Commerce ou Electro Dépôt.
 - Playwright (navigateur sans interface) seulement pour les sites qui affichent le prix en JavaScript.
   Il est 10 à 50 fois plus coûteux qu'une requête HTTP.
 - Option : conserver le HTML brut compressé pendant quelques jours, pour déboguer et rejouer les extracteurs.
@@ -184,6 +185,7 @@ Téléviseur OLED 55" Marque X (EAN 1234567890123)
 | Navigateur | Playwright | – |
 | Analyse HTML | selectolax ou parsel | BeautifulSoup |
 | Données structurées | extruct | – |
+| `robots.txt` | protego | – |
 | Modèles | Pydantic v2 | – |
 | Base de données | PostgreSQL (SQLite possible pour le MVP) | – |
 | ORM et migrations | SQLAlchemy 2 et Alembic | SQLModel |
@@ -191,7 +193,8 @@ Téléviseur OLED 55" Marque X (EAN 1234567890123)
 | Telegram | aiogram 3 | python-telegram-bot |
 | API et tableau de bord | FastAPI (avec HTMX ou un petit front) | Django |
 | Supervision | structlog, Sentry | Prometheus et Grafana |
-| Déploiement | Docker Compose sur un VPS, GitHub Actions | – |
+| Déploiement | Docker Compose sur l'ordinateur personnel (option A), puis un VPS si besoin. GitHub Actions pour la CI | – |
+| Surveillance de disponibilité | Healthchecks.io (offre gratuite) : prévient si le bot ne donne plus signe de vie | – |
 
 Pour un balayage à grande échelle, Scrapy est une alternative crédible à httpx avec un
 planificateur maison : limitation de débit intégrée, respect de `robots.txt`, pipelines.
