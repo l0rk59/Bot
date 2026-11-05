@@ -6,32 +6,48 @@
 |---|---|---|---|
 | GitHub (déjà en place) | Code, CI | 0 | Gratuit |
 | Bot Telegram (via @BotFather) et un groupe privé | Recevoir les alertes | 0 | Gratuit |
-| VPS (ex. Hetzner, OVH, Scaleway) | Faire tourner le bot 24 h/24 | 2 | Environ 5 à 20 € par mois |
+| **Keepa API** | Prix et historiques Amazon dans une dizaine de pays | 2 | **Environ 49 € par mois** (formule d'entrée, à confirmer sur keepa.com/api), résiliable chaque mois |
+| Serveur allumé 24 h/24 | Faire tourner le bot | 2 | 0 € (ordinateur personnel) ou environ 5 € par mois (VPS) |
 | Sentry | Suivre les erreurs | 2 | Offre gratuite suffisante |
-| Réseaux d'affiliation (Awin, Effiliation, Kwanko…) | Flux produits | 4 | Gratuit, inscription soumise à validation (un site ou une chaîne est souvent demandé) |
-| Amazon Partenaires et son API produits | Données Amazon | 4 | Gratuit, accès conditionné à des ventes (vérifier la version actuelle de l'API) |
-| Keepa *(option)* | Historique des prix Amazon | 3–4 | Abonnement payant |
-| Clé d'API LLM *(option)* | Vérification des candidats | 5 | À l'usage, avec un plafond |
-| Nom de domaine *(option)* | Tableau de bord public | 6 | Environ 10 € par an |
+| Clé d'API LLM *(option)* | Vérification des candidats ambigus | 5 | À l'usage, avec un plafond (quelques euros par mois) |
+
+Les réseaux d'affiliation (Awin…) et l'API officielle d'Amazon sont écartés : ils demandent un
+site ou des ventes générées, ce qui ne correspond pas à un usage personnel (voir [SITES.md](SITES.md)).
 
 ## 2. Infrastructure
 
 | Stade | Machine | Services |
 |---|---|---|
 | Phases 0 et 1 | Ordinateur personnel (Python 3.12+, Docker) | SQLite ou PostgreSQL en Docker |
-| Phases 2 et 3 | VPS 2 vCPU, 4 Go de RAM, 40 Go SSD | PostgreSQL, Redis, workers, bot Telegram |
-| Phase 4 et suivantes | VPS 4 vCPU, 8 Go de RAM (Playwright est gourmand) | Idem, plus de workers |
+| Phase 2 et suivantes | VPS 2 vCPU, 4 Go de RAM (ou ordinateur allumé en permanence) | PostgreSQL, Redis, workers, bot Telegram |
+| Si beaucoup de pages en JavaScript | VPS 4 vCPU, 8 Go de RAM | Idem, plus de workers |
 
 Sauvegarde quotidienne de la base (`pg_dump`) stockée hors du serveur.
 
-## 3. Budget estimé
+## 3. Budget : pourquoi et combien
 
-| Stade | Coût mensuel |
-|---|---|
-| Phases 0 et 1 (en local) | 0 € |
-| Phases 2 et 3 (VPS) | 5 à 20 € |
-| Phases 4 et 5 (serveur plus gros, Keepa et LLM en option) | 30 à 100 € selon les options |
-| Phase 6 (public) | Selon le trafic |
+Le budget, c'est ce que le bot coûte **chaque mois** pour fonctionner. Deux postes seulement :
+
+**1. Une machine allumée 24 h/24.** Les erreurs de prix sont souvent corrigées en quelques
+minutes ou quelques heures. Si le bot ne tourne que quand l'ordinateur est allumé, il rate la
+plupart d'entre elles. Deux possibilités :
+- l'ordinateur personnel, laissé allumé en permanence : gratuit, mais le bot s'arrête à chaque extinction ou coupure ;
+- un petit serveur loué (VPS, ex. Hetzner, OVH) : **environ 5 € par mois**, toujours allumé.
+
+**2. L'accès aux données d'Amazon.** Amazon interdit les robots sur son site. La voie propre
+est l'API Keepa, qui suit Amazon dans une dizaine de pays : **environ 49 € par mois**. C'est le principal poste de dépense.
+
+Tous les autres sites accessibles (LDLC, Rue du Commerce, TopAchat…) sont gratuits.
+
+| Option | Contenu | Coût mensuel |
+|---|---|---|
+| **A. Gratuit** | Ordinateur personnel, sites accessibles uniquement, **pas d'Amazon** | 0 € |
+| **B. Serveur** | VPS, sites accessibles uniquement, **pas d'Amazon** | environ 5 € |
+| **C. Complet** | VPS, sites accessibles **et Amazon dans une dizaine de pays** | environ 55 € |
+
+**Recommandation** : commencer gratuitement (option A) pendant la phase 1, le temps de voir le
+bot fonctionner. Passer à l'option C au début de la phase 2. Keepa se résilie à tout moment :
+si les résultats ne suivent pas, on arrête.
 
 ## 4. Compétences
 
@@ -46,28 +62,23 @@ Sauvegarde quotidienne de la base (`pg_dump`) stockée hors du serveur.
 
 ## 5. Données de départ
 
-- **Sites candidats à évaluer** avec la [fiche site](JURIDIQUE.md#4-fiche-site-à-remplir-avant-tout-connecteur)
-  (exemples de grands sites français à étudier, sans préjuger de leurs CGU) : Amazon.fr,
-  Cdiscount, Fnac, Darty, Boulanger, Rue du Commerce, LDLC, Carrefour, Auchan, E.Leclerc,
-  Conforama, Decathlon, Leroy Merlin, ManoMano, Rakuten.
+- **Sites** : voir [SITES.md](SITES.md). Pour le MVP : LDLC ou Rue du Commerce.
 - **Produits témoins** : 100 à 300 produits avec URL et EAN, de préférence chers (plus de
-  100 €) et vendus par plusieurs marchands, pour pouvoir les comparer.
-- **Catégories prioritaires** : high-tech, électroménager, jeux vidéo et jouets, maison et bricolage.
+  100 €) et vendus à la fois sur Amazon et sur les sites accessibles.
+- **Catégories prioritaires** : high-tech (là où les sites accessibles sont les plus forts),
+  électroménager, jeux vidéo et jouets, maison.
 
-## 6. Décisions à prendre
+## 6. Décisions
 
-Elles sont nécessaires avant de démarrer la phase 1. Une recommandation est proposée pour chacune.
-
-| # | Question | Recommandation |
+| # | Question | Réponse |
 |---|---|---|
-| 1 | Usage : personnel, entre amis, public, commercial ? | **Personnel** d'abord, ce qui simplifie le juridique et l'infrastructure |
-| 2 | Marchés : France seulement ou Europe ? | **France**, puis Amazon UE en phase 4 |
-| 3 | Verticales : produits seulement, ou aussi vols et hôtels ? | **Produits** d'abord, vols en phase 7 |
-| 4 | Sites pilotes (3 à 5) | À choisir après les fiches site |
-| 5 | Catégories prioritaires | High-tech, électroménager, jeux vidéo et jouets, maison |
-| 6 | Canal d'alerte | **Telegram** |
-| 7 | Seuil minimal d'une alerte | Baisse d'au moins 50 % **et** au moins 30 € d'économie |
-| 8 | Budget mensuel maximal | 20 € jusqu'à la phase 3 |
-| 9 | Langage | **Python** |
-| 10 | Achat automatique | **Non** |
-| 11 | Temps disponible par semaine | À préciser, pour recalibrer les durées de la roadmap |
+| 1 | Usage | ✅ **Personnel uniquement** |
+| 2 | Marchés | ✅ **Monde entier**, par étapes : France, puis UE, puis reste du monde |
+| 3 | Verticales | ✅ **Produits d'abord** |
+| 4 | Sites | ✅ Amazon (via Keepa) et sites accessibles. Cdiscount et Fnac bloquent les robots : signal secondaire seulement |
+| 5 | Canal d'alerte | ✅ Telegram |
+| 6 | Langage | ✅ Python |
+| 7 | Achat automatique | ✅ Non |
+| 8 | **Budget** | ⏳ Option A, B ou C (section 3). Recommandation : A pour la phase 1, puis C |
+| 9 | **Temps disponible par semaine** | ⏳ À préciser, pour recalibrer les durées |
+| 10 | Seuil minimal d'une alerte | Proposé : baisse d'au moins 50 % **et** au moins 30 € d'économie (réglable) |

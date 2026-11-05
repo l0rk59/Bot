@@ -14,8 +14,9 @@ saisie, mauvaise devise, prix d'un autre produit…) et envoie une alerte en que
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phases de développement, tâches, critères de fin, jalons, risques |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Composants, stack technique, modèle de données, structure du code |
 | [docs/DETECTION.md](docs/DETECTION.md) | Définition d'une erreur de prix, signaux, score, faux positifs |
+| [docs/SITES.md](docs/SITES.md) | Quels sites sont accessibles à un robot, et par quelle voie (test du 5/11/2026) |
 | [docs/JURIDIQUE.md](docs/JURIDIQUE.md) | Cadre légal (France/UE), règles de collecte responsable, fiche par site |
-| [docs/BESOINS.md](docs/BESOINS.md) | Comptes, infrastructure, budget, compétences et **décisions à prendre** |
+| [docs/BESOINS.md](docs/BESOINS.md) | Comptes, infrastructure, budget expliqué, compétences, décisions |
 
 ## Fonctionnement en 7 étapes
 

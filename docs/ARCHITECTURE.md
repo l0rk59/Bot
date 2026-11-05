@@ -38,13 +38,13 @@ Par ordre de préférence :
 
 | Source | Avantages | Inconvénients | Usage |
 |---|---|---|---|
-| **API officielle** (ex. API Amazon Partenaires) | Fiable, structurée, autorisée | Accès conditionné, quotas | Collecte principale quand elle existe |
-| **Flux produits d'affiliation** (Awin, Effiliation, Kwanko, Rakuten…) | Catalogue complet avec EAN, autorisé | Souvent mis à jour une fois par jour, trop lent pour la détection en temps réel | Découverte de produits, prix de référence |
+| **API de données** (Keepa pour Amazon) | Fiable, structurée, autorisée, plusieurs pays, historique inclus | Payante, quota de jetons | **Source Amazon** (voir [SITES.md](SITES.md)) |
+| **API officielle** (ex. Creators API d'Amazon) | Fiable, structurée, autorisée | Réservée aux affiliés qui génèrent des ventes | Écartée pour un usage personnel |
+| **Flux produits d'affiliation** (Awin, Effiliation, Kwanko, Rakuten…) | Catalogue complet avec EAN, autorisé | Inscription avec un site ou une chaîne, mise à jour souvent quotidienne | Écartés pour un usage personnel |
 | **Données structurées des pages** (JSON-LD schema.org `Product`/`Offer`) | Résiste aux refontes visuelles, une seule méthode pour beaucoup de sites | Il faut récupérer la page | Collecte principale par défaut |
 | **Pages de liste** (catégories, recherche) | 20 à 60 prix par requête | Moins de détails, EAN souvent absent | Balayage large |
 | **Sélecteurs HTML propres au site** | Fonctionne partout | Fragile, demande de la maintenance | Solution de secours |
-| **Services d'historique** (ex. Keepa pour Amazon) | Historique disponible dès le premier jour | Payant | Prix de référence |
-| **Communautés de bons plans** | Vérité terrain | L'erreur est déjà publique | Mesure du rappel |
+| **Communautés de bons plans** | Vérité terrain, couvrent les sites bloqués | L'erreur est déjà publique | Signal secondaire, mesure du rappel |
 
 ## 2. Planificateur
 
@@ -102,6 +102,9 @@ Pièges à couvrir par des tests :
 
 - Devise au format ISO 4217 et conversion en euros (taux quotidiens de la BCE).
 - Prix TTC, frais de port séparés.
+- Pays du site et **livraison vers la France** (oui, non ou inconnu).
+- **Prix rendu en France** pour les offres hors UE : prix, livraison, TVA à l'importation et
+  droits de douane estimés. La détection compare ce prix-là, pas le prix affiché.
 - État : `new`, `refurbished` ou `used`.
 - Vendeur : le marchand lui-même ou un vendeur tiers de marketplace (nom et note si disponibles).
 - Disponibilité : `in_stock`, `out_of_stock`, `preorder` ou `unknown`.
